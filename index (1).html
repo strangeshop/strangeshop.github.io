@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#064C72">
+<meta name="format-detection" content="telephone=no">
+<title>音ガチャ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Tsukimi+Rounded:wght@300;400;500;700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0}
+/* Layout: a record slides out of its sleeve and spins (hero), then a sleeve back cover lists the song; single-theme 70s retro look by choice */
+:root {
+  --navy: #064c72;
+  --teal: #026c80;
+  --sage: #8db4ad;
+  --red: #e9311a;
+  --orange: #ed6335;
+  --yellow: #f8b31a;
+  --paper: #f6ede6;
+  --vinyl: #0f2433;
+  --ink: #064c72;
+  --line: rgba(141,180,173,.4);
+  /* 番号・曲名・アーティスト・サービス名：英字はCourier Prime、日本語はTsukimi Rounded */
+  --f-display: "Courier Prime", "Tsukimi Rounded", "Hiragino Maru Gothic ProN", monospace;
+  /* 小さめのラベル類 */
+  --f-body: "Noto Sans", "Tsukimi Rounded", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --f-mono: var(--f-body);
+  /* ひとことmemo・選んだひと */
+  --f-round: "Tsukimi Rounded", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
+  /* 最下部の一文 */
+  --f-foot: var(--f-round);
+  color-scheme: dark;
+}
+html, body { min-height: 100%; }
+body {
+  background-color: var(--navy);
+  color: var(--paper);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+.wrap {
+  max-width: 420px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 36px;
+  min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: center; gap: 22px;
+}
+.brand {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: .24em;
+  text-transform: uppercase; color: var(--sage);
+  display: flex; gap: 10px; align-items: center; justify-content: center;
+}
+.brand::before, .brand::after { content: ""; width: 28px; height: 1px; background: var(--line); }
+
+/* ── hero: sleeve + record ── */
+.deck { position: relative; width: 100%; aspect-ratio: 100 / 61; }
+.sleeve {
+  position: absolute; left: 0; top: 0; width: 61%; aspect-ratio: 1; z-index: 2;
+  background: var(--teal); border-radius: 6px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 14px 14px 0;
+}
+.sleeve .label-top { font-family: var(--f-mono); font-size: 10px; letter-spacing: .2em; color: var(--sage); }
+.sleeve .big { font-family: var(--f-display); font-weight: 400; font-size: clamp(44px, 15vw, 62px); line-height: .9; color: var(--paper); font-variant-numeric: tabular-nums; }
+.sleeve .big small { display: block; font-family: var(--f-display); font-size: 11px; letter-spacing: .2em; color: var(--yellow); margin-bottom: 6px; }
+.stripes { margin: 0 -14px; display: grid; }
+.stripes span { height: 14px; }
+.stripes span:nth-child(1) { background: var(--red); }
+.stripes span:nth-child(2) { background: var(--orange); }
+.stripes span:nth-child(3) { background: var(--yellow); }
+
+.record {
+  position: absolute; top: 3%; left: 3%; width: 58%; aspect-ratio: 1; z-index: 1;
+  animation: slide 1s .3s cubic-bezier(.25,.9,.3,1) forwards;
+  border-radius: 50%; overflow: hidden; /* keep the spinning box from widening the page */
+  box-shadow: 0 8px 20px rgba(0,0,0,.3);
+}
+@keyframes slide { to { left: 41%; } }
+.disc {
+  width: 100%; height: 100%; border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 0 33%, rgba(255,255,255,.05) 33.5%, transparent 34%),
+    repeating-radial-gradient(circle, var(--vinyl) 0 2px, #16303f 2.5px 3px),
+    var(--vinyl);
+  position: relative;
+  animation: spin 1.8s linear infinite; /* 33⅓ rpm = 1.8 s per turn */
+}
+.disc::after { /* sheen */
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 30deg, transparent 0 10%, rgba(255,255,255,.08) 14%, transparent 20% 60%, rgba(255,255,255,.06) 64%, transparent 70%);
+}
+.center {
+  position: absolute; inset: 31%; border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 4px var(--red), inset 0 0 0 7px var(--paper), inset 0 0 0 9px var(--orange);
+  display: grid; place-items: center; text-align: center; color: var(--ink);
+}
+.center .lno { font-family: var(--f-display); font-weight: 700; font-size: clamp(13px, 4vw, 17px); line-height: 1; position: absolute; top: 19%; left: 0; right: 0; }
+.center .rpm { position: absolute; bottom: 20%; left: 0; right: 0; font-family: var(--f-mono); font-size: 7px; letter-spacing: .14em; color: var(--teal); }
+.center .hole { position: absolute; left: 50%; top: 50%; width: 7%; aspect-ratio: 1; border-radius: 50%; background: var(--navy); transform: translate(-50%,-50%); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── back cover ── */
+.back {
+  background: var(--paper); color: var(--ink);
+  border-radius: 6px;
+  padding: 18px 20px 20px;
+  display: flex; flex-direction: column; gap: 12px;
+  animation: rise .6s .9s cubic-bezier(.2,.9,.3,1.1) both;
+}
+@keyframes rise { from { transform: translateY(24px); opacity: .0; } to { transform: none; opacity: 1; } }
+.head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.side { font-family: var(--f-mono); font-size: 11px; letter-spacing: .16em; color: var(--teal); }
+.side b { color: var(--red); font-weight: 500; }
+.tag { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--teal); color: var(--paper); white-space: nowrap; }
+.rule { border-top: 2px solid var(--ink); margin: 0; }
+.rule.thin { border-top-width: 1px; opacity: .25; }
+
+.track { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; align-items: baseline; }
+.track .pos { font-family: var(--f-mono); font-size: 13px; color: var(--red); }
+.title { font-family: var(--f-display); font-weight: 500; font-size: clamp(30px, 10vw, 42px); line-height: 1.08; margin: 0; white-space: nowrap; min-width: 0; }
+.title.small { font-size: clamp(24px, 7.6vw, 32px); line-height: 1.15; }
+.artist { grid-column: 2; font-family: var(--f-display); font-weight: 500; font-size: 15px; margin: 4px 0 0; }
+.meta { grid-column: 2; font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; color: var(--teal); margin: 0; font-variant-numeric: tabular-nums; }
+.memo { margin: 0; font-family: var(--f-round); padding: 12px 14px; border-radius: 6px; background: rgba(248,179,26,.2); font-size: 14px; line-height: 1.75; }
+.memo .by, .by-solo { display: flex; justify-content: flex-end; align-items: baseline; gap: 8px; margin-top: 6px; font-weight: 300; font-size: 14px; font-family: var(--f-round); }
+.by em { font-style: normal; font-family: var(--f-round); font-weight: 400; font-size: 11px; letter-spacing: .08em; color: var(--teal); }
+.by-solo { margin: 0; }
+.memo small { display: block; font-family: var(--f-round); font-size: 11px; letter-spacing: .08em; color: var(--teal); margin-bottom: 2px; }
+
+.svc-label { font-family: var(--f-mono); font-size: 10px; letter-spacing: .16em; color: var(--teal); margin: 4px 0 -4px; }
+.services { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.svc {
+  display: flex; align-items: center; gap: 8px; min-width: 0;
+  min-height: 52px; padding: 12px 14px; border-radius: 6px; text-decoration: none;
+  background: var(--teal); color: var(--paper); font-family: var(--f-display); font-weight: 500; font-size: 13px; line-height: 1.3;
+  transition: transform .15s ease;
+}
+.svc:active { transform: scale(.97); background: var(--navy); }
+.svc:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.svc i { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--c); box-shadow: 0 0 0 2px var(--paper); }
+
+.foot { font-family: var(--f-foot); font-size: 13px; color: var(--sage); text-align: center; margin: 0; }
+
+.empty { text-align: center; display: grid; gap: 10px; padding-block: 24px; }
+.empty h1 { font-family: var(--f-round); font-weight: 700; font-size: 24px; margin: 0; }
+.empty p { color: var(--sage); margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .record { animation: none; left: 41%; }
+  .disc, .back { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">音ガチャ</div>
+  <main id="out"></main>
+  <p class="foot">キーホルダーをかざすと、いつでもこの1曲に会えます</p>
+</div>
+
+<script>
+/* ▼ 曲リスト：キーホルダーの番号ごとに1曲。URLの末尾 ?no=1, ?no=2 … が番号になります（No.00はサンプル） */
+const SONGS = {
+  "0": {
+    title: "TAIDADA",
+    artist: "ずっと真夜中でいいのに。",
+    year: "2024",
+    tag: "アニメ『ダンダダン』ED",
+    by: "（おすすめした人の名前）",
+    memo: "（ここにあなたのひとことが入ります）サビ前のギターのリフから一気に持っていかれる、アップテンポな1曲。",
+    // 曲ページのURLが分かるサービスだけ書く。書かなかったサービスは曲名で検索するリンクになります
+    links: {
+      apple: "https://music.apple.com/jp/song/1770242096"
+      // spotify: "", amazon: "", ytmusic: "", line: ""
+    }
+  },
+  "1": {
+    title: "obsession",
+    artist: "jizue",
+    year: "2024",
+    tag: "インスト",
+    by: "ao",
+    memo: "ギター、ベース、ピアノ、ドラム…それぞれのリズムが気持ちいい曲。",
+    links: {
+      apple: "https://music.apple.com/jp/album/obsession/1759509305?i=1759509306",
+      spotify: "https://open.spotify.com/track/2sbXCzEskFPka5D80ZKzbG",
+      amazon: "https://music.amazon.co.jp/tracks/B0DB7H7F3N",
+      ytmusic: "https://music.youtube.com/watch?v=bCWplMUqoBU",
+      line: "https://lin.ee/OmfAalY"
+    }
+  },
+  "2": {
+    title: "White Room",
+    artist: "Cream",
+    year: "1968",
+    tag: "ロック",
+    by: "ao",
+    memo: "特にイントロを聴いてほしい。",
+    links: {
+      apple: "https://music.apple.com/jp/album/white-room/1440830708?i=1440830954",
+      spotify: "https://open.spotify.com/track/3Xls4cNOwy01dtrNXb1inG",
+      amazon: "https://music.amazon.co.jp/tracks/B00BJVSSEY",
+      ytmusic: "https://music.youtube.com/watch?v=V5BF1V1pbTs",
+      line: "https://lin.ee/ReUG4Fw"
+    }
+  },
+  "3": {
+    title: "衝動の粒子",
+    artist: "fox capture plan",
+    year: "2013",
+    tag: "インスト",
+    by: "ao",
+    memo: "ライブ演奏を聴いた時の衝撃が忘れられない。",
+    links: {
+      apple: "https://music.apple.com/jp/album/%E8%A1%9D%E5%8B%95%E3%81%AE%E7%B2%92%E5%AD%90/1863212447?i=1863212462",
+      spotify: "https://open.spotify.com/track/6YOIl2cQIlAupjoBh0IRek",
+      amazon: "https://music.amazon.co.jp/tracks/B0GB7YVRXK",
+      ytmusic: "https://music.youtube.com/watch?v=W1h9FbpX3wU",
+      line: "https://lin.ee/xY5z3j2"
+    }
+  },
+  "4": {
+    title: "Handshake With Hell",
+    artist: "Arch Enemy",
+    year: "2022",
+    tag: "メタル",
+    by: "ao",
+    memo: "出勤する時とか、１日の始まりにおすすめしたい。",
+    links: {
+      apple: "https://music.apple.com/jp/album/handshake-with-hell/1621063080?i=1621063081",
+      spotify: "https://open.spotify.com/track/2NPGPNZo24Cf9ViSC6ek0T",
+      amazon: "https://music.amazon.co.jp/tracks/B09YX3YDX9",
+      ytmusic: "https://music.youtube.com/watch?v=mAhMvAfPSN0",
+      line: "https://lin.ee/XZA6Xb9"
+    }
+  },
+  "5": {
+    title: "Dreams",
+    artist: "Fleetwood Mac",
+    year: "1977",
+    tag: "ロック",
+    by: "ao",
+    memo: "落ち着くボーカルに身を委ねて。",
+    links: {
+      apple: "https://music.apple.com/jp/album/dreams/594061854?i=594061856",
+      spotify: "https://open.spotify.com/track/0ofHAoxe9vBkTCp2UQIavz",
+      amazon: "https://music.amazon.co.jp/tracks/B00D2V0BPS",
+      ytmusic: "https://music.youtube.com/watch?v=5oWyMakvQew",
+      line: "https://lin.ee/5tQp808"
+    }
+  },
+  "6": {
+    title: "Movin' on without you",
+    artist: "宇多田ヒカル",
+    year: "1999",
+    tag: "J-POP",
+    by: "ao",
+    memo: "軽やかに駆けていくようなテンポが心地いい。",
+    links: {
+      apple: "https://music.apple.com/jp/album/movin-on-without-you-remastered-2014/1440763349?i=1440763354",
+      spotify: "https://open.spotify.com/track/2meqZM0xytUvlJnTSYoEAB",
+      amazon: "https://music.amazon.co.jp/tracks/B077VKR61T",
+      ytmusic: "https://music.youtube.com/watch?v=hWkuUqFGkmo",
+      line: "https://lin.ee/OcZMHM2"
+    }
+  },
+  "7": {
+    title: "悲しくなる前に",
+    artist: "indigo la End",
+    year: "2015",
+    tag: "J-POP",
+    by: "ao",
+    memo: "イントロのベースがかっこいい。",
+    links: {
+      apple: "https://music.apple.com/jp/album/%E6%82%B2%E3%81%97%E3%81%8F%E3%81%AA%E3%82%8B%E5%89%8D%E3%81%AB/1113095113?i=1113095201",
+      spotify: "https://open.spotify.com/track/4j8uTrAbMkO67iFaUW74EX",
+      amazon: "https://music.amazon.co.jp/tracks/B0BXPH4VHB",
+      ytmusic: "https://music.youtube.com/watch?v=3UqmCGPkhHY",
+      line: "https://lin.ee/E7LyaD6"
+    }
+  },
+  "8": {
+    // \n で曲名を改行、small: true で曲名を少し小さく
+    title: "Separate Ways\n(Worlds Apart)",
+    small: true,
+    artist: "Journey",
+    year: "1983",
+    tag: "ロック",
+    by: "ao",
+    memo: "始まりの数秒で、惹き込まれる。",
+    links: {
+      apple: "https://music.apple.com/jp/album/separate-ways-worlds-apart-2024-remaster/169003304?i=169004756",
+      spotify: "https://open.spotify.com/track/4NiyMmBdlVHpZWScgdBvnt",
+      amazon: "https://music.amazon.co.jp/tracks/B076NRJJFK",
+      ytmusic: "https://music.youtube.com/watch?v=UsdGgRL1xHc",
+      line: "https://lin.ee/pCUDgvfY"
+    }
+  },
+  "9": {
+    title: "ハートの合図",
+    artist: "DADARAY",
+    year: "2020",
+    tag: "J-POP",
+    by: "ao",
+    memo: "タイプの違う2人の歌声がいい感じ。",
+    links: {
+      apple: "https://music.apple.com/jp/album/%E3%83%8F%E3%83%BC%E3%83%88%E3%81%AE%E5%90%88%E5%9B%B3/1514110937?i=1514110938",
+      spotify: "https://open.spotify.com/track/5zAlyKufCyJMhMbtgazzlO",
+      amazon: "https://music.amazon.co.jp/tracks/B088TQBDGL",
+      ytmusic: "https://music.youtube.com/watch?v=yyNWqmKHTRc",
+      line: "https://lin.ee/hKPqysF"
+    }
+  },
+  "10": {
+    title: "片目で異常に恋してる",
+    artist: "ジェニーハイ",
+    year: "2018",
+    tag: "ロック",
+    by: "ao",
+    memo: "独奏のようなメロディーなのに浮いていないピアノが好き。",
+    links: {
+      apple: "https://music.apple.com/jp/album/%E7%89%87%E7%9B%AE%E3%81%A7%E7%95%B0%E5%B8%B8%E3%81%AB%E6%81%8B%E3%81%97%E3%81%A6%E3%82%8B/1357583562?i=1357583759",
+      spotify: "https://open.spotify.com/track/4Ms2FB2oo1y7giydhxcuJE",
+      amazon: "https://music.amazon.co.jp/tracks/B07VWSK71D",
+      ytmusic: "https://music.youtube.com/playlist?list=OLAK5uy_nUdjOTIELksgEZ7DlwYRYBQnv8t-sthBg",
+      line: "https://lin.ee/breNvn3"
+    }
+  }
+  // "2": { title: "...", artist: "...", year: "...", tag: "...", by: "おすすめした人", memo: "...", links: { apple: "...", spotify: "..." } },
+};
+
+const SERVICES = [
+  { id: "apple",   name: "Apple Music",   color: "#fa2d48", search: q => `https://music.apple.com/jp/search?term=${q}` },
+  { id: "spotify", name: "Spotify",       color: "#1ed760", search: q => `https://open.spotify.com/search/${q}` },
+  { id: "amazon",  name: "Amazon Music",  color: "#25d1da", search: q => `https://music.amazon.co.jp/search/${q}` },
+  { id: "ytmusic", name: "YouTube Music", color: "#ff3b30", search: q => `https://music.youtube.com/search?q=${q}` },
+  { id: "line",    name: "LINE MUSIC",    color: "#06c755", search: q => `https://music.line.me/webapp/search?query=${q}` },
+  { id: "youtube", name: "YouTubeで探す", searchOnly: true, color: "#ff0033", search: q => `https://www.youtube.com/results?search_query=${q}` }
+];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function deck(no) {
+  return `
+    <div class="deck" aria-hidden="true">
+      <div class="record"><div class="disc"><div class="center"><span class="lno">${no}</span><span class="rpm">33⅓ RPM</span><span class="hole"></span></div></div></div>
+      <div class="sleeve">
+        <span class="label-top">OTO GACHA RECORDS</span>
+        <span class="big"><small>No.</small>${no}</span>
+        <div class="stripes"><span></span><span></span><span></span></div>
+      </div>
+    </div>`;
+}
+
+function render() {
+  const key = (new URLSearchParams(location.search).get("no") || location.hash.slice(1) || "1").replace(/^0+(?=\d)/, "");
+  const no = esc(key.padStart(2, "0"));
+  const s = SONGS[key];
+  const out = document.getElementById("out");
+  if (!s) {
+    out.innerHTML = `<div class="empty"><h1>まだ何も録音されていません</h1><p>このキーホルダー（No.${no}）には、まだ曲が入っていません。</p></div>`;
+    return;
+  }
+  const q = encodeURIComponent(`${s.artist} ${s.title.replace(/\n/g, " ")}`);
+  out.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:22px">
+    ${deck(no)}
+    <article class="back">
+      <div class="head">
+        <span class="side">SIDE <b>A</b> · No.${no}</span>
+        ${s.tag ? `<span class="tag">${esc(s.tag)}</span>` : ""}
+      </div>
+      <hr class="rule">
+      <div class="track">
+        <span class="pos">A1</span>
+        <h1 class="title${s.small ? " small" : ""}">${esc(s.title).replace(/\n/g, "<br>")}</h1>
+        <p class="artist">${esc(s.artist)}</p>
+        ${s.year ? `<p class="meta">RELEASED ${esc(s.year)}</p>` : ""}
+      </div>
+      ${s.memo ? `<div class="memo"><small>ひとことmemo</small>${esc(s.memo)}${s.by ? `<div class="by"><em>選んだひと</em>${esc(s.by)}</div>` : ""}</div>` : (s.by ? `<p class="by-solo by"><em>選んだひと</em>${esc(s.by)}</p>` : "")}
+      <hr class="rule thin">
+      <p class="svc-label">LISTEN ON</p>
+      <div class="services">
+        ${SERVICES.map(v => `<a class="svc" style="--c:${v.color}" href="${esc((!v.searchOnly && s.links && s.links[v.id]) || v.search(q))}" rel="noopener"><i></i>${v.name}</a>`).join("")}
+      </div>
+    </article>
+    </div>`;
+}
+/* 曲名を1行に収める：はみ出すときだけ文字を小さくする */
+function fitTitle() {
+  const t = document.querySelector(".title");
+  if (!t) return;
+  t.style.fontSize = "";
+  let size = parseFloat(getComputedStyle(t).fontSize);
+  while (t.scrollWidth > t.clientWidth && size > 16) {
+    size -= 1;
+    t.style.fontSize = size + "px";
+  }
+}
+function show() { render(); fitTitle(); }
+show();
+addEventListener("hashchange", show);
+addEventListener("resize", fitTitle);
+if (document.fonts) document.fonts.ready.then(fitTitle);
+</script>
+</body>
+</html>
